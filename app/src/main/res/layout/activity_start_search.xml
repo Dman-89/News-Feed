@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimaryDark">
+
+    <ProgressBar
+        android:id="@+id/loading_indicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:visibility="gone"/>
+
+    <ImageView
+        android:id="@+id/the_guardian_header"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/theguardian"
+        android:tint="@android:color/white"/>
+
+    <TextView
+        android:id="@+id/search_header"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/the_guardian_header"
+        android:layout_centerHorizontal="true"
+        android:fontFamily="@font/bodoni_xt"
+        android:gravity="center"
+        android:paddingLeft="46dp"
+        android:paddingRight="46dp"
+        android:text="@string/search_news"
+        android:textAppearance="?android:textAppearanceLarge"
+        android:textColor="@android:color/white"
+        android:textSize="28sp"/>
+
+    <EditText
+        android:id="@+id/search_box"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/search_header"
+        android:layout_margin="16dp"
+        android:backgroundTint="@android:color/white"
+        android:textColor="@android:color/white"/>
+
+    <Button
+        android:id="@+id/search_btn"
+        android:layout_width="160dp"
+        android:layout_height="70dp"
+        android:layout_below="@id/search_box"
+        android:layout_centerHorizontal="true"
+        android:text="@string/search"
+        android:textAllCaps="true"
+        android:textAppearance="?android:textAppearanceLarge"
+        android:textColor="@color/colorPrimaryDark" />
+
+    <TextView
+        android:id="@+id/no_internet_connection"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="144dp"
+        android:text="@string/no_internet_connection"
+        android:textAppearance="?android:textAppearanceMedium"
+        android:textColor="@android:color/holo_blue_light"
+        android:visibility="gone"/>
+
+    <TextView
+        android:id="@+id/powered_by"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/the_guardian_op_logo"
+        android:layout_centerHorizontal="true"
+        android:text="@string/powered_by"
+        android:textAppearance="?android:textAppearanceMedium"
+        android:textColor="@android:color/white"/>
+
+    <ImageView
+        android:id="@+id/the_guardian_op_logo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="12dp"
+        android:src="@drawable/theguardian_op_logo"/>
+
+</RelativeLayout>

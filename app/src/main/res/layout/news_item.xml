@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="@dimen/list_item_height">
+
+    <RelativeLayout
+        android:id="@+id/text_container"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/list_item_height"
+        android:background="@color/colorPrimary"
+        android:paddingLeft="16dp">
+
+        <TextView
+            android:id="@+id/date_published_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="6dp"
+            android:textColor="@android:color/white"
+            tools:text="27 Jan 2018"/>
+
+        <TextView
+            android:id="@+id/section_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/date_published_textview"
+            android:fontFamily="@font/bodoni_xt"
+            android:textColor="@android:color/white"
+            tools:text="Interesting theme"
+            android:paddingLeft="16dp"/>
+
+        <TextView
+            android:id="@+id/title_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/section_textview"
+            android:layout_marginRight="56dp"
+            android:fontFamily="@font/bodoni_xt"
+            android:textAppearance="?android:textAppearanceMedium"
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
+            tools:text="An awesome article header that goes on 2 lines of text"
+            android:paddingLeft="16dp"/>
+
+        <TextView
+            android:id="@+id/author_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/title_textview"
+            android:textColor="@android:color/white"
+            tools:text="by Sample Author"/>
+
+    </RelativeLayout>
+
+    <ImageView
+        android:layout_width="@dimen/icon"
+        android:layout_height="@dimen/icon"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="16dp"
+        android:src="@drawable/baseline_pageview_white_36" />
+
+</RelativeLayout>
