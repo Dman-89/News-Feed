@@ -1,8 +1,11 @@
 package com.example.android.newsfeed;
 
 import android.app.LoaderManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
@@ -12,7 +15,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
+import com.example.android.newsfeed.BuildConfig;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,14 +39,18 @@ public class NewsActivity extends AppCompatActivity implements LoaderManager.Loa
     /** ArrayList for adapter */
     private ArrayList<News> news = new ArrayList<>();
 
-    ProgressBar mProgressBar;
+    private ProgressBar mProgressBar;
+
+    // app API key for authentication
+    private static String API_KEY = BuildConfig.ApiKey;
 
     // "show-tags=contributor" requests output of info about article author
     public static String GUARDIAN_API_REQUEST_URL = "https://content.guardianapis.com/search?" +
-            "api-key=fa4dbc95-3100-4976-8490-c197816d1a1b&show-tags=contributor&q=";
+            "show-tags=contributor&api-key=" + API_KEY + "&q=";
 
     private static String USER_QUERY;
 
+//    private int SLEEP_TIME = 4000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,16 +102,26 @@ public class NewsActivity extends AppCompatActivity implements LoaderManager.Loa
         clearAdapter();
 
         mProgressBar = findViewById(R.id.loading_indicator_news);
-        if (!news.isEmpty()) { // news != null is always true
+        if (news != null && !news.isEmpty()) {
             mProgressBar.setVisibility(View.GONE);
             mAdapter.addItems(news);
             mAdapter.notifyDataSetChanged();
         } else {
+            ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo netInfo = cm.getActiveNetworkInfo();
+            boolean isConnected = netInfo != null && netInfo.isConnected();
             RecyclerView recyclerView = findViewById(R.id.list);
-            recyclerView.setVisibility(View.GONE);
-            mProgressBar.setVisibility(View.GONE);
 
-            mEmptyStateTextView.setVisibility(View.VISIBLE);
+            if (isConnected) {
+                recyclerView.setVisibility(View.GONE);
+                mProgressBar.setVisibility(View.GONE);
+                mEmptyStateTextView.setVisibility(View.VISIBLE);
+            } else {
+                recyclerView.setVisibility(View.GONE);
+                mProgressBar.setVisibility(View.GONE);
+                mEmptyStateTextView.setVisibility(View.VISIBLE);
+                mEmptyStateTextView.setText(R.string.no_internet_connection);
+            }
         }
     }
 

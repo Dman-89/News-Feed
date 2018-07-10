@@ -1,5 +1,6 @@
 package com.example.android.newsfeed;
 
+import android.print.PrinterId;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -22,16 +23,13 @@ import java.util.List;
 public class QueryUtils {
     private static final String LOG_TAG = QueryUtils.class.getSimpleName();
 
+    private static int READ_TIMEOUT = 10000; /* milliseconds */
+    private static int CONNECT_TIMEOUT = 15000; /* milliseconds */
+
     private QueryUtils() {
     }
 
     public static List<News> fetchNewsData(String requestUrl) {
-        // simulation of low internet connection
-//        try {
-//            Thread.sleep(2000); // sleep for 2 seconds
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
 
         Log.i("TEST " + LOG_TAG, "entered fetchNewsData method");
 
@@ -77,8 +75,8 @@ public class QueryUtils {
 
         try {
             urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setReadTimeout(10000 /* milliseconds */);
-            urlConnection.setConnectTimeout(15000 /* milliseconds */);
+            urlConnection.setReadTimeout(READ_TIMEOUT);
+            urlConnection.setConnectTimeout(CONNECT_TIMEOUT);
             urlConnection.setRequestMethod("GET");
             urlConnection.connect();
 
@@ -148,17 +146,26 @@ public class QueryUtils {
                 Log.i("TEST " + LOG_TAG, dateSplit);
 
                 if(currentNews.has("tags")) {
-                    JSONObject authorJson = (JSONObject) currentNews.getJSONArray("tags").get(0);
-                    if(authorJson.getString("type").equals("contributor")){
-                        Log.i("TEST " + LOG_TAG,"currentNews object author data exist");
-                        String author = authorJson.getString("webTitle");
-                        Log.i("TEST " + LOG_TAG, author);
-                        News newsObject = new News(sectionName, title, url, dateSplit, "by " + author);
-                        news.add(newsObject);
+                    JSONArray tags = currentNews.getJSONArray("tags");
+
+                    if (tags.length() > 0) {
+                        JSONObject authorJson = (JSONObject) tags.get(0);
+
+                        if(authorJson.getString("type").equals("contributor")){
+                            Log.i("TEST " + LOG_TAG,"currentNews object author data exist");
+                            String author = authorJson.getString("webTitle");
+                            Log.i("TEST " + LOG_TAG, author);
+                            News newsObject = new News(sectionName, title, url, dateSplit, "by " + author);
+                            news.add(newsObject);
+
+                        } else {
+                            Log.i("TEST " + LOG_TAG, "No author data");
+                            News newsObject = new News(sectionName, title, url, dateSplit);
+                            news.add(newsObject);
+                        }
+
                     } else {
-                        Log.i("TEST " + LOG_TAG, "No author data");
-                        News newsObject = new News(sectionName, title, url, dateSplit);
-                        news.add(newsObject);
+                        Log.i("TEST " + LOG_TAG, "tags array is empty");
                     }
 
                 } else {
