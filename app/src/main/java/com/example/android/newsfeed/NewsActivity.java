@@ -4,14 +4,20 @@ import android.app.LoaderManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -45,12 +51,11 @@ public class NewsActivity extends AppCompatActivity implements LoaderManager.Loa
     private static String API_KEY = BuildConfig.ApiKey;
 
     // "show-tags=contributor" requests output of info about article author
-    public static String GUARDIAN_API_REQUEST_URL = "https://content.guardianapis.com/search?" +
-            "show-tags=contributor&api-key=" + API_KEY + "&q=";
+    public static String GUARDIAN_API_REQUEST_URL = "https://content.guardianapis.com/search?show-tags=contributor";
 
     private static String USER_QUERY;
 
-//    private int SLEEP_TIME = 4000;
+    private static final String PREFS_QUERY = "user query";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +64,24 @@ public class NewsActivity extends AppCompatActivity implements LoaderManager.Loa
 
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
-        USER_QUERY = extras.get("query").toString();
+        // when returning from SettingsActivity, extras will throw NullPointerException because
+        // it's reloading and opened NOT from MainActivity
+        if (extras != null) {
+            // silently saving last user query to preferences
+            USER_QUERY = extras.get("query").toString();
+            if (USER_QUERY.length() == 0) {
+                USER_QUERY = "latest news";
+            }
+            SharedPreferences.Editor editor = getSharedPreferences(PREFS_QUERY, MODE_PRIVATE).edit();
+            editor.putString("query", USER_QUERY);
+            editor.apply();
+        } else {
+            // restore USER_QUERY from preferences
+            SharedPreferences prefs = getSharedPreferences(PREFS_QUERY, MODE_PRIVATE);
+            USER_QUERY = prefs.getString("query", null);
+        }
+
+
         Log.i("TEST News Activity", USER_QUERY);
 
         // Find a reference to the {@link RecyclerView} in the layout
@@ -92,7 +114,31 @@ public class NewsActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public Loader<List<News>> onCreateLoader(int i, Bundle bundle) {
         Log.i("TEST " + LOG_TAG, "onCreateLoader called");
-        return new NewsLoader(this, GUARDIAN_API_REQUEST_URL + USER_QUERY);
+
+        SharedPreferences sharedPrefs = PreferenceManager .getDefaultSharedPreferences(this);
+
+        String articlesToDisplay = sharedPrefs.getString(
+                getString(R.string.settings_articles_to_display_key),
+                getString(R.string.settings_articles_to_display_default));
+
+        String orderBy = sharedPrefs.getString(
+                getString(R.string.settings_order_by_key),
+                getString(R.string.settings_order_by_default));
+
+        // parse breaks apart the URI string that's passed into its parameter
+        Uri baseUri = Uri.parse(GUARDIAN_API_REQUEST_URL);
+
+        // buildUpon prepares the baseUri that we just parsed so we can add query parameters to it
+        Uri.Builder uriBuilder = baseUri.buildUpon();
+
+        // Append query parameter and its value. For example, the `format=geojson`
+        uriBuilder.appendQueryParameter("q", USER_QUERY);
+        uriBuilder.appendQueryParameter("api-key", API_KEY);
+        uriBuilder.appendQueryParameter("page-size", articlesToDisplay);
+        uriBuilder.appendQueryParameter("order-by", orderBy);
+
+
+        return new NewsLoader(this, uriBuilder.toString()); //GUARDIAN_API_REQUEST_URL + USER_QUERY
     }
 
     @Override
@@ -102,6 +148,7 @@ public class NewsActivity extends AppCompatActivity implements LoaderManager.Loa
         clearAdapter();
 
         mProgressBar = findViewById(R.id.loading_indicator_news);
+        // news array might be null when extractNews() returns null (at the top of method)
         if (news != null && !news.isEmpty()) {
             mProgressBar.setVisibility(View.GONE);
             mAdapter.addItems(news);
@@ -131,9 +178,31 @@ public class NewsActivity extends AppCompatActivity implements LoaderManager.Loa
         clearAdapter();
     }
 
-
     public void clearAdapter() {
         news.clear();
         mAdapter.notifyDataSetChanged();
+    }
+
+    // inflates the Options Menu we specified in the XML when the EarthquakeActivity opens up.
+    @Override
+    // This method initializes the contents of the Activity's options menu.
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the Options Menu we specified in XML
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    // This method is where we can setup the specific action that occurs when any of the items
+    // in the Options Menu are selected.
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_settings) {
+            // open the SettingsActivity via an intent
+            Intent settingsIntent = new Intent(this, SettingsActivity.class);
+            startActivity(settingsIntent);
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

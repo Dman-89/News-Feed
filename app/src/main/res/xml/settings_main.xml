@@ -1,0 +1,21 @@
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:title="@string/settings_title">
+
+    <EditTextPreference
+        android:defaultValue="@string/settings_articles_to_display_default"
+        android:inputType="numberDecimal"
+        android:key="@string/settings_articles_to_display_key"
+        android:selectAllOnFocus="true"
+        android:title="@string/settings_articles_to_display_label" />
+
+    <ListPreference
+        android:defaultValue="@string/settings_order_by_default"
+        android:entries="@array/settings_order_by_labels"
+        android:entryValues="@array/settings_order_by_values"
+        android:key="@string/settings_order_by_key"
+        android:title="@string/settings_order_by_label" />
+
+    <!-- android:entries="@array/settings_order_by_labels" - Uses the string array we setup earlier in res/values/arrays.xml which are what appears as the labels for the user to read.
+         android:entryValues="@array/settings_order_by_values" - Uses the other string array from res/values/arrays.xml contains the value to save for a preference when an entry from entries is selected. -->
+</PreferenceScreen>

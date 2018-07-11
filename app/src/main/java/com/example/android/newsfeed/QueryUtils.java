@@ -147,7 +147,8 @@ public class QueryUtils {
 
                 if(currentNews.has("tags")) {
                     JSONArray tags = currentNews.getJSONArray("tags");
-
+                    // tags array will exist, but not for all articles author is present
+                    // as consequence tags array may be empty, length == 0
                     if (tags.length() > 0) {
                         JSONObject authorJson = (JSONObject) tags.get(0);
 
